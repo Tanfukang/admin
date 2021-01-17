@@ -63,8 +63,8 @@ export default {
         },
         {
           icon: "el-icon-document-copy",
-          path: "/dynamicForm",
-          title: "动态表单"
+          path: "/dynamicList",
+          title: "动态列表"
         },
         {
           icon: "el-icon-document-copy",
@@ -75,6 +75,11 @@ export default {
           icon: "el-icon-s-grid",
           path: "/table",
           title: "表格"
+        },
+        {
+          icon: "el-icon-finished",
+          path: "/test",
+          title: "测试"
         }
       ]
     };

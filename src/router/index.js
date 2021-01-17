@@ -24,11 +24,11 @@ const router = new Router({
       component: () => import("../views/Home"),
       children: [
         {
-          path: "/dynamicForm",
-          name: "dynamicForm",
-          meta: { title: "动态表单" },
+          path: "/dynamicList",
+          name: "dynamicList",
+          meta: { title: "动态列表" },
           component: () =>
-            import(/* webpackChunkName: "about" */ "../views/DynamicForm.vue")
+            import(/* webpackChunkName: "about" */ "../views/DynamicList.vue")
         },
         {
           path: "/dashboard",
@@ -50,6 +50,13 @@ const router = new Router({
           meta: { title: "表格" },
           component: () =>
             import(/* webpackChunkName: "about" */ "../views/Table.vue")
+        },
+        {
+          path: "/test",
+          name: "Test",
+          meta: { title: "测试" },
+          component: () =>
+            import(/* webpackChunkName: "about" */ "../views/Test.vue")
         }
       ]
     }

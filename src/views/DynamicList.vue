@@ -10,8 +10,9 @@
   <div class="wrapper">
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <span>动态表单</span>
+        <span>交易列表</span>
       </div>
+      <!-- 视图条件 -->
       <el-form
         :model="ruleForm"
         :rules="rules"
@@ -20,8 +21,9 @@
         class="demo-ruleForm"
       >
         <div class="date-select">
-          <el-form-item label="时间:" prop="relativeTime">
+          <el-form-item label="时间：" prop="relativeTime">
             <el-date-picker
+              size="small"
               v-model="ruleForm.relativeTime"
               type="datetimerange"
               format="yyyy-MM-dd HH:mm"
@@ -38,6 +40,7 @@
           <div class="date-control">
             最近：
             <el-select
+              size="small"
               @change="selectTime"
               v-model="timeValue"
               placeholder="请选择"
@@ -56,11 +59,13 @@
             <el-button
               icon="el-icon-arrow-left"
               @click="theDayBefore"
+              size="small"
               :disabled="ruleForm.relativeTime.length ? false : true"
               >前一天</el-button
             >
             <el-button
               @click="theDayAfter"
+              size="small"
               :disabled="ruleForm.relativeTime.length ? false : true"
               >后一天<i class="el-icon-arrow-right el-icon--right"></i
             ></el-button>
@@ -77,7 +82,7 @@
             class="form-item"
             :rules="rules.level1"
           >
-            <el-select v-model="item.level1" filterable placeholder="请选择">
+            <el-select v-model="item.level1" filterable placeholder="请选择" size="small">
               <el-option
                 v-for="v in firstList"
                 :key="v.value"
@@ -92,7 +97,7 @@
             class="form-item"
             :rules="rules.level2"
           >
-            <el-select v-model="item.level2" filterable placeholder="请选择">
+            <el-select v-model="item.level2" filterable placeholder="请选择" size="small">
               <el-option
                 v-for="i in lastList"
                 :key="i.value"
@@ -107,11 +112,12 @@
             class="form-item-last"
             :rules="rules.level3"
           >
-            <el-input v-model="item.level3" placeholder="请输入内容"></el-input>
+            <el-input v-model="item.level3" placeholder="请输入内容" size="small"></el-input>
           </el-form-item>
           <el-form-item style="width:80px;display: inline-block;">
             <el-button
               type="danger"
+              size="small"
               icon="el-icon-delete"
               circle
               @click="deleteView(index)"
@@ -123,20 +129,110 @@
             type="primary"
             @click="add()"
             icon="el-icon-plus"
+            size="small"
             :disabled="ruleForm.dataList.length > 9"
             >添加</el-button
           >
-          <el-button @click="resetForm('ruleForm')" icon="el-icon-refresh"
+          <el-button @click="resetForm('ruleForm')" icon="el-icon-refresh" size="small"
             >重置</el-button
           >
           <el-button
             type="primary"
+            size="small"
             @click="query('ruleForm')"
             icon="el-icon-search"
             >查询</el-button
           >
         </div>
       </el-form>
+      <!-- 列表数据 -->
+      <el-card shadow="never" style="margin-top:20px;">
+         <el-table
+         v-loading="isTableLoading"
+    :data="tableData"
+    style="width: 100%">
+    <el-table-column
+      label="交易名称"
+      width="180">
+      <template slot-scope="scope">
+        <span style="margin-left: 10px">{{ scope.row.name }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="交易方式"
+      width="150">
+      <template slot-scope="scope">
+        <span style="margin-left: 10px">{{ scope.row.type }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="交易金额"
+      sortable
+      width="180">
+      <template slot-scope="scope">
+        <span style="margin-left: 10px">{{ scope.row.money }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="交易日期"
+      sortable
+      width="180">
+      <template slot-scope="scope">
+        <i class="el-icon-time"></i>
+        <span style="margin-left: 10px">{{ scope.row.date }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="交易地址"
+      width="180">
+      <template slot-scope="scope">
+        <i class="el-icon-location-information"></i>
+        <span style="margin-left: 10px">{{ scope.row.address }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="交易用户"
+      width="100">
+      <template slot-scope="scope">
+        <el-popover trigger="hover" placement="top">
+          <p>姓名: {{ scope.row.name }}</p>
+          <p>住址: {{ scope.row.address }}</p>
+          <div slot="reference" class="name-wrapper">
+            <el-tag size="medium">{{ scope.row.user }}</el-tag>
+          </div>
+        </el-popover>
+      </template>
+    </el-table-column>
+    <el-table-column label="操作">
+      <template slot-scope="scope">
+        <el-button
+          size="mini"
+          @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          <el-popconfirm
+            title="这条交易记录确定删除吗？"
+          >
+        <el-button
+          style="margin-left:10px;"
+          slot="reference"
+          size="mini"
+          type="danger"
+          @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+        </el-popconfirm>
+      </template>
+    </el-table-column>
+  </el-table>
+      <div class="table-pagination">
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="currentPage"
+          :page-sizes="[100, 200, 300, 400]"
+          :page-size="100"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="400">
+        </el-pagination>
+      </div>
+      </el-card>
     </el-card>
   </div>
 </template>
@@ -234,11 +330,15 @@ export default {
         },
         {
           value: "type",
-          label: "交易类型"
+          label: "交易方式"
         },
         {
           value: "name",
           label: "交易名称"
+        },
+        {
+          value: "user",
+          label: "交易用户"
         }
       ],
       lastList: [
@@ -309,9 +409,15 @@ export default {
           { required: true, message: "请选择时间", trigger: "change" }
         ],
         level1: [{ required: true, message: "请选择", trigger: "change" }],
-        level2: [{ required: true, message: "请输入内容", trigger: "change" }],
+        level2: [{ required: true, message: "请选择", trigger: "change" }],
         level3: [{ required: true, message: "请输入内容", trigger: "change" }]
-      }
+      },
+      // 表格相关数据
+      isTableLoading:true,
+      tableData: [],
+      total: 0,
+      pagesize:10,
+      currentPage:1
     };
   },
   watch: {
@@ -377,16 +483,73 @@ export default {
     },
     //后一天时间
     theDayAfter() {
+      console.log(this.ruleForm.relativeTime[0],this.ruleForm.relativeTime[1]);
       this.$set(
         this.ruleForm.relativeTime,
         0,
         this.ruleForm.relativeTime[0] + 24 * 60 * 60 * 1000
       );
+    },
+    getTableList() {
+      setTimeout(() => {
+        this.isTableLoading = false;
+        this.tableData = [
+        {
+          name:'天虹超市购物',
+          date: '2016-05-02',
+          money: 1313113,
+          user: '王小虎',
+          type: '现金支付',
+          address: '上海市普陀区金沙江路 1518 弄'
+        }, {
+          name:'海底捞火锅',
+          date: '2016-05-04',
+          user: '王小虎',
+          money: 1313113,
+          type: '微信支付',
+          address: '上海市普陀区金沙江路 1517 弄'
+        }, {
+          name:'理发',
+          date: '2016-05-01',
+          user: '王小虎',
+          money: 1313113,
+          type: '支付宝支付',
+          address: '上海市普陀区金沙江路 1519 弄'
+        }, {
+          name:'乘坐地铁',
+          date: '2016-05-03',
+          user: '王小虎',
+          money: 1313113,
+          type: '信用卡支付',
+          address: '上海市普陀区金沙江路 1516 弄'
+        },
+      ]
+      }, 2000);
+    },
+    resetDateFilter() {
+        this.$refs.filterTable.clearFilter('date');
+      },
+    //修改数据
+    handleEdit(index, row) {
+      console.log(index, row);
+    },
+    //删除数据
+    handleDelete(index, row) {
+      console.log(index, row);
+    },
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`);
+      this.pagesize = val;
+    },
+    handleCurrentChange(val) {
+      console.log(`当前页: ${val}`);
+      this.currentPage = val;
     }
   },
   created() {},
   mounted() {
     this.initDate();
+    this.getTableList();
   }
 };
 </script>
@@ -423,5 +586,9 @@ export default {
 }
 .date-control {
   margin-left: 10px;
+}
+.table-pagination {
+  margin-top: 20px;
+  text-align: right;
 }
 </style>
